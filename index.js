@@ -13,18 +13,20 @@ const download = (uri, fileName, cb)=>{
             return;
         }
         console.log('file not exist');
+        const file = fs.createWriteStream(fileName);
+        const request = https.get(uri, function(response) {
+            response.pipe(file);
+         
+            // after download completed close filestream
+            file.on("finish", () => {
+                file.close();
+                console.log("Download Completed");
+                cb()
+                // return;
+            });
+         });
     }))
-    const file = fs.createWriteStream(fileName);
-    const request = https.get(uri, function(response) {
-       response.pipe(file);
-    
-       // after download completed close filestream
-       file.on("finish", () => {
-           file.close();
-           console.log("Download Completed");
-           cb()
-       });
-    });
+    return;
 }
 
 
@@ -213,7 +215,10 @@ app.get('/video2', async (req, res) => {
     //     }
     });
 
-
+    setTimeout( () => {
+        console.log('we gonna remove file :', fileName, 'now.')
+        fs.rm(fileName, ()=>{})
+    } ,20000);
 
     // let filePath='file2.mp4'
     // // Listing 3.
