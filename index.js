@@ -7,11 +7,7 @@ const app = express()
 const port = process.env.PORT || 3000
 
 const download = (uri, fileName, cb)=>{
-    if(fs.stat(fileName, function(err, state){
-        if(state){
-            console.log('file is exist')
-            return;
-        }
+
         console.log('file not exist');
         const file = fs.createWriteStream(fileName);
         const request = https.get(uri, function(response) {
@@ -25,8 +21,6 @@ const download = (uri, fileName, cb)=>{
                 // return;
             });
          });
-    }))
-    return;
 }
 
 
