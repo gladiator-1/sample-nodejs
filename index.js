@@ -6,8 +6,15 @@ const mp4Url = 'https://www.expensify.com/chat-attachments/993313808/w_236f82a24
 const app = express()
 const port = process.env.PORT || 3000
 
-const download = (uri,cb)=>{
-    const file = fs.createWriteStream("file.mp4");
+const download = (uri, fileName, cb)=>{
+    if(fs.stat(fileName, function(err, state){
+        if(state){
+            console.log('file is exist')
+            return;
+        }
+        console.log('file not exist');
+    }))
+    const file = fs.createWriteStream(fileName);
     const request = https.get(uri, function(response) {
        response.pipe(file);
     
@@ -25,6 +32,7 @@ app.get("/video", function (req, res) {
     const {uri} = req.query;
     // console.log('uri :',uri)
     const encodedUri = uri.split('encryptedAuthToken=')[0] + "encryptedAuthToken=" + encodeURIComponent(uri.split('encryptedAuthToken=')[1])
+    const fileName = uri.split('?')[0].split('w_')[1];
     console.log('encode uri :',encodedUri)
     https.get(encodedUri, (stream) => {
         stream.pipe(res);
@@ -35,9 +43,10 @@ app.get("/video", function (req, res) {
 app.get('/video2', async (req, res) => {
     const {uri} = req.query;
     const encodedUri = uri.split('encryptedAuthToken=')[0] + "encryptedAuthToken=" + encodeURIComponent(uri.split('encryptedAuthToken=')[1])
+    const fileName = uri.split('?')[0].split('w_')[1];
 
-    await download(encodedUri,()=>{
-        let filePath='file.mp4'
+    download(encodedUri, fileName, ()=>{
+        let filePath = fileName;
         // Listing 3.
         const options = {};
     
